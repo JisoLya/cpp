@@ -27,4 +27,5 @@ x64/
 !*/
 !*.cpp
 !*.h
+!*.cu
 !.gitignore

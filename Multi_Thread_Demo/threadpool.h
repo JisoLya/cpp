@@ -8,7 +8,7 @@
 #include <condition_variable>
 #include <thread>
 
-// ÈÎÎñÀà£¬ ·â×°³ÉÒ»¸öº¯Êý
+// ï¿½ï¿½ï¿½ï¿½ï¿½à£¬ ï¿½ï¿½×°ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 class Task {
 private:
     int t_id;
@@ -28,12 +28,13 @@ public:
     }
 };
 
-// 2. Ïß³Ì°²È«¶ÓÁÐÀà
+// 2. ï¿½ß³Ì°ï¿½È«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 class SafeQueue {
 private:
 	std::queue<Task> m_queue;
     size_t cap_;
 	std::mutex mtx_;
+    bool is_shutdown;
 
     std::condition_variable not_full_cv;
     std::condition_variable not_empty_cv;
@@ -51,9 +52,11 @@ public:
     }
 	void push(Task&& t);
 	Task pop();
+
+    void shutdown();
 };
 
-// 3. ºËÐÄ´¦ÀíÆ÷Àà
+// 3. ï¿½ï¿½ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 class ThreadPool {
 public:
     ThreadPool(int worker_count);
@@ -68,8 +71,8 @@ public:
     };
 
 private:
-    void worker_loop(); // ºËÐÄÏß³ÌÑ­»·
-	void producer_loop(); // Éú²úÕßÏß³ÌÑ­»·
+    void worker_loop(); // ï¿½ï¿½ï¿½ï¿½ï¿½ß³ï¿½Ñ­ï¿½ï¿½
+	void producer_loop(); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß³ï¿½Ñ­ï¿½ï¿½
 	bool is_stopped;
 
 	SafeQueue task_queue;
@@ -77,5 +80,5 @@ private:
 
 	std::vector<std::thread> workers;
 
-	std::thread producer_thread_; // Ïò¶ÓÁÐÖÐÌí¼ÓÈÎÎñµÄÏß³Ì
+	std::thread producer_thread_; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß³ï¿½
 };
