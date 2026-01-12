@@ -3,10 +3,17 @@
 #include<vector>
 
 __global__ void parrallel_sum(int* sum, int const *arr, int n){
+    int local_sum = 0;
     for(int i = blockIdx.x * blockDim.x + threadIdx.x; i < n; i += blockDim.x * gridDim.x){
         // sum[0] += arr[i];
-        atomicAdd(&sum[0], arr[i]);
+        // atomicAdd(&sum[0], arr[i]);
+        /*
+        但是使用atomicAdd()会导致性能下降，因为它会强制线程串行化访问同一个内存位置
+        解决方案是使用每个线程块的局部和，然后再把局部和加到全局和中
+        */
+        local_sum += arr[i];
     }
+    atomicAdd(&sum[0], local_sum);
 }
 
 template<typename T>
@@ -34,7 +41,7 @@ int main(){
         arr[i] = 1;
     }
 
-    parrallel_sum<<<256, 256>>>(sum.data(), arr.data(), n);
+    parrallel_sum<<<n/512, 256>>>(sum.data(), arr.data(), n);
     cudaDeviceSynchronize();
 
     /**
@@ -45,6 +52,7 @@ int main(){
     但是多个线程同时进行这个操作时，会出现数据竞争，导致最终错误
     所以应该使用atomicAdd()保证原子性
     
+
     */
     printf("Sum: %d\n", sum[0]);
     return 0;
